@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IPL 2019 Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div>
+        <h1>IPL 2019 Chatbot</h1>
+        <div id="chat-window">
+            <div id="chat-output"></div>
+            <input type="text" id="user-input" placeholder="Ask me about IPL 2019...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#send-button').click(function() {
+                const userInput = $('#user-input').val();
+                $('#chat-output').append(`<div>User: ${userInput}</div>`);
+
+                $.ajax({
+                    type: "POST",
+                    url: "https://dialogflow.googleapis.com/v2/projects/YOUR_PROJECT_ID/agent/sessions/YOUR_SESSION_ID:detectIntent",
+                    headers: {
+                        "Authorization": "Bearer YOUR_ACCESS_TOKEN"
+                    },
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        "queryInput": {
+                            "text": {
+                                "text": userInput,
+                                "languageCode": "en"
+                            }
+                        }
+                    }),
+                    success: function(response) {
+                        const botResponse = response.queryResult.fulfillmentText;
+                        $('#chat-output').append(`<div>Bot: ${botResponse}</div>`);
+                        $('#user-input').val('');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
